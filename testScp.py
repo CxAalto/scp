@@ -2,7 +2,6 @@ import os
 executable="./k_clique"
 tempDir="./"
 testDataDir="testData/"
-testNets=["yeast_normalized.edg"]
 
 def listComp(l1,l2):
     if len(l1)!=len(l2):
@@ -35,6 +34,8 @@ def compareCommunities(scpComms,cfComms):
     #print l2
     return l1==l2
 
+
+testNets=filter(lambda x:x.endswith(".edg"),os.listdir(testDataDir))
 
 for net in testNets:
     print "Testing ",
