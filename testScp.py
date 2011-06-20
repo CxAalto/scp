@@ -40,13 +40,14 @@ testNets=filter(lambda x:x.endswith(".edg"),os.listdir(testDataDir))
 for net in testNets:
     print "Testing ",
     print net,
-    print "... ",
+    print "..."
 
     #find the k-values
     kvalues=[]
-    for file in os.listdir(testDataDir+net+"_files/"):
-        if file.startswith("k="):
-            kvalues.append(int(file[2:]))
+    if os.path.exists(testDataDir+net+"_files/"):
+        for file in os.listdir(testDataDir+net+"_files/"):
+            if file.startswith("k="):
+                kvalues.append(int(file[2:]))
     kvalues.sort()
 
     for k in kvalues:
@@ -59,7 +60,7 @@ for net in testNets:
         list(os.popen(executable+ " "+testDataDir+net+" -k="+str(k)+" -o="+tempDir+"temp.txt"))
 
         if compareCommunities(tempDir+"temp.txt",testDataDir+net+"_files/k="+str(k)+"/communities"):
-            print "OK. ",
+            print "OK."
         else:
             print "FAILED!"
             break
