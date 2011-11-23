@@ -1,3 +1,16 @@
+/*
+A C++ implementation of the sequential clique percolation (SCP) algorithm. This version is seriously cripled and only unweighted clique percolation without 
+thresholding is allowed. However, all the code to include further functionality is already included in the source code.
+
+If you use this code to produce results for a publication, please cite:
+A sequential algorithm for fast clique percolation, J.M. Kumpula, M. Kivelä, K. Kaski,and J. Saramäki, Phys. Rev. E 79, 026109 (2008)
+
+The article contains detailed introduction to the SCP.
+
+Authors: Eetu Latja, Mikko Kivelä and Jussi Kumpula.
+*/
+
+
 #include "k_clique.h"
 #include "dendrogram.h"
 
@@ -10,9 +23,10 @@ at most one edge between two nodes in the edge file.\n\
 Options:\n\
 \t-o=[outputfile] : Write output to a specified file.\n\
 \t-k=[clique size] : The size of the clique.\n\
-\t-w : Use weighted clique percolation.\n\
-\t-v : Verbose mode.\n\
-\t-f=[weightfunction] : Specifies a weight function when using weighted clique percolation.\n "
+\t-v : Verbose mode.\n "
+
+//\t-w : Use weighted clique percolation.\n\
+//\t-f=[weightfunction] : Specifies a weight function when using weighted clique percolation.\n "
 
 struct Link{
   size_t source;
@@ -108,7 +122,6 @@ bool readLine(std::ifstream & myfile, size_t & source,  size_t & dest, float & w
     return readlineok;
 }
 
-//OMA
 void kCliquesFind(std::vector<weighedClique> & cliqueVector, NetType & net, size_t source, size_t dest, const float weight, const size_t k, const size_t weightFunction)
 {
 
@@ -213,7 +226,6 @@ void kCliquesFind(std::vector<weighedClique> & cliqueVector, NetType & net, size
   net[source][dest] = weight; 
 }
 
-//OMA
 void kCommunitiesFind(std::vector<weighedClique> & cliqueVector, KruskalTree & communities, cliqueHash & k1cliquesHash, NetType & net, const size_t k)
 {
     std::vector<size_t> tempVector;
@@ -260,7 +272,6 @@ void kCommunitiesFind(std::vector<weighedClique> & cliqueVector, KruskalTree & c
     }
 }
 
-//OMA
 void outputCommunityStructure(KruskalTree & communities, cliqueHash & k1cliquesHash, std::ofstream & file)
 {
     // Go through each community and put nodes from each community into a nodeSet
@@ -290,7 +301,6 @@ void outputCommunityStructure(KruskalTree & communities, cliqueHash & k1cliquesH
 }
 
 
-//OMA
 void unweightedSCP(NetType & net, std::list<Link> & linkList, const size_t numberOfLinks, const size_t k, std::string outputFile,bool verbose)
 {
     size_t source, dest;
@@ -347,13 +357,8 @@ bool weighedCliqueCmp(const weighedClique lhs, const weighedClique rhs)
     return lhs.getWeight() > rhs.getWeight();
 }
 
-//OMA
 void kCommunitiesFindWeighted(std::vector<weighedClique> & cliqueVector, KruskalTree & communities, cliqueHash & k1cliquesHash, NetType & net, const size_t k, const float threshold)
 {
-    // NÄÄ POIS KUN ON VALMISTA
-    std::ofstream testifilu("/proj/net_scratch/Eetu/dendotesti1.txt");
-    std::ofstream testifilu2("/proj/net_scratch/Eetu/dendotesti2.txt");
-    std::ofstream testifilu3("/proj/net_scratch/Eetu/dendotesti3.txt");
 
     std::vector<size_t> tempVector;
     weighedClique k1clique;
@@ -370,14 +375,12 @@ void kCommunitiesFindWeighted(std::vector<weighedClique> & cliqueVector, Kruskal
 
         currentCliqueNumber++;
 
-        testifilu3 << i->getWeight() << std::endl;
-        nodeComs.printCommunities(testifilu3);
+        //nodeComs.printCommunities(nodeCommunitOutputFile);
     }
 
-    dendrogram.printTree(testifilu2);
+    //dendrogram.printTree(dendrogramOutputFile);
 }
 
-//OMA
 void weightedSCP(NetType & net, std::ifstream & file, const size_t numberOfLinks, const size_t k, const float threshold, const size_t weightFunction, std::string outputFile)
 {
     size_t source, dest;
@@ -428,7 +431,6 @@ bool validateLinkList(std::list<Link> &linkList,size_t netSize,bool verbose){
 }
 
 
-//OMA
 int percolation(char * fileName, const size_t k, const size_t weighted, const float threshold, const size_t weightFunction, std::string outputFile,bool verbose,bool sanityCheck)
 {
     size_t numberOfLinks;
@@ -457,7 +459,6 @@ int percolation(char * fileName, const size_t k, const size_t weighted, const fl
     return EXIT_SUCCESS;
 }
 
-//OMA
 int main(int argc, char* argv[])
 {
     size_t netSize, numberOfLinks;
@@ -473,17 +474,18 @@ int main(int argc, char* argv[])
     {
       if (!strncmp(argv[i], "-k=", 3))
 	k = atoi(argv[i] + 3);
+      else if (!strncmp(argv[i], "-o=", 3))
+	outputFile = argv[i] + 3;
+      else if (!strcmp(argv[i], "-v"))
+	verbose=true;
+/*
       else if (!strcmp(argv[i], "-w"))
 	weighted = 1;
       else if (!strncmp(argv[i], "-t=", 3))
 	threshold = atof(argv[i] + 3);
       else if (!strcmp(argv[i], "-f"))
 	weightFunction = atof(argv[++i]);
-      else if (!strncmp(argv[i], "-o=", 3))
-	outputFile = argv[i] + 3;
-      else if (!strcmp(argv[i], "-v"))
-	verbose=true;
-      else{
+*/      else{
 	std::cerr << "Invalid argument: "<<argv[i] <<std::endl;
 	std::cerr << HELPSTR<<std::endl;
 	return EXIT_FAILURE;	  
