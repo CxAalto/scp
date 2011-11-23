@@ -2,10 +2,10 @@
 #include "dendrogram.h"
 
 #define HELPSTR "Usage: ./k_clique [inputfile] [options]\n\
-The input file must be in the edge list format, where at each\
-line there three columns: node1Index, node2Index and edge weight separated\
-by a white space. Node indices must be integers from 0 to n-1, where n is the\
-number of nodes in the network. Edges are undirected and there can only be\
+The input file must be in the edge list format, where at each \
+line there three columns: node1Index, node2Index and edge weight separated \
+by a white space. Node indices must be integers from 0 to n-1, where n is the \
+number of nodes in the network. Edges are undirected and there can only be \
 at most one edge between two nodes in the edge file.\n\
 Options:\n\
 \t-o=[outputfile] : Write output to a specified file.\n\
@@ -429,7 +429,7 @@ bool validateLinkList(std::list<Link> &linkList,size_t netSize,bool verbose){
 
 
 //OMA
-void percolation(char * fileName, const size_t k, const size_t weighted, const float threshold, const size_t weightFunction, std::string outputFile,bool verbose,bool sanityCheck)
+int percolation(char * fileName, const size_t k, const size_t weighted, const float threshold, const size_t weightFunction, std::string outputFile,bool verbose,bool sanityCheck)
 {
     size_t numberOfLinks;
     size_t netSize;
@@ -437,11 +437,11 @@ void percolation(char * fileName, const size_t k, const size_t weighted, const f
     
     // First read in the network from the file
     if (verbose) std::cout << "Reading in the network...\n";
-    if (!getNetSizeAndLinkNumbers(fileName, netSize, numberOfLinks,linkList)) return;    
+    if (!getNetSizeAndLinkNumbers(fileName, netSize, numberOfLinks,linkList)) return EXIT_FAILURE;    
     if (verbose) std::cout<< "Number of nodes: " << netSize << "\nNumber of links: " <<numberOfLinks << "\n";
 
     //Check that the edge list is valid, this will waste some time
-    if (sanityCheck) if (!validateLinkList(linkList,netSize,verbose)) return;
+    if (sanityCheck) if (!validateLinkList(linkList,netSize,verbose)) return EXIT_FAILURE;
 
     // Finally, proceed with the clique percolation
     std::ifstream file(fileName);
@@ -454,6 +454,7 @@ void percolation(char * fileName, const size_t k, const size_t weighted, const f
             weightedSCP(net, file, numberOfLinks, k, threshold, weightFunction, outputFile);
     }
     file.close();
+    return EXIT_SUCCESS;
 }
 
 //OMA
@@ -485,7 +486,7 @@ int main(int argc, char* argv[])
       else{
 	std::cerr << "Invalid argument: "<<argv[i] <<std::endl;
 	std::cerr << HELPSTR<<std::endl;
-	return 0;	  
+	return EXIT_FAILURE;	  
       }	        
     }
 
@@ -495,14 +496,14 @@ int main(int argc, char* argv[])
     if (argc==1){
       std::cerr << "Invalid number of arguments."<<std::endl;
       std::cerr << HELPSTR<<std::endl;
-      return 0;
+      return EXIT_FAILURE;
     }
 
     //Check that the clique size is valid
     if (k < 3)
     {
         std::cerr << "Invalid value of clique size k: " << k << std::endl << "The value of k must be 3 or larger." << std::endl;
-        return 0;
+        return EXIT_FAILURE;
     }
     //Check the the output file is given. If not, use "[inputfile]_output"
     if (outputFile.empty())
@@ -512,15 +513,15 @@ int main(int argc, char* argv[])
     }
 
 
-    //--- Run clique percolation
-    percolation(argv[1], k, weighted, threshold, weightFunction, outputFile,verbose,true);
+    //--- Run clique percolation    
+    int exitCode=percolation(argv[1], k, weighted, threshold, weightFunction, outputFile,verbose,true);
 
 
     // calculate timings
     if (verbose)
       std::cout << "Time used: " << (double)clock() / (double)CLOCKS_PER_SEC << "s" << std::endl;
 
-    return 1;
+    return exitCode;
 }
 
 
